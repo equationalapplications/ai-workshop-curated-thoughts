@@ -166,6 +166,18 @@ PORT=4242
 
 ```
 
+### Curating the Wisdom Tier 
+
+Demonstrate the human-in-the-loop approval process and explore the generated knowledge.
+
+The Approval Queue: In the Curated Thoughts UI, navigate to the Review Queue. Show the attendees that the Active Librarian has proposed new wiki pages (e.g., "Stripe Checkout Integration Rules" or "Required Payload Structures").
+
+Human-in-the-Loop: Have the attendees review and Approve these changes.
+
+Explore the Wiki: Navigate to the wiki/ tab in the UI. Open the newly approved pages.
+
+Talking Point: Highlight that this is the Wisdom Tier. The AI didn't just store the PDFs; it read them and wrote a living, readable architectural guide for the repository. The coding agent will now use both the raw facts and this synthesized wisdom to write perfect code.
+
 ### Prompting & Synthesis
 
 Time to execute the task.
