@@ -1,0 +1,27 @@
+# Node
+node_modules/
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+npm-debug.log*
+.env
+.env.*
+.DS_Store
+/build
+/dist
+/.parcel-cache
+/.next
+/out
+
+# React
+coverage/
+public/static/
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
