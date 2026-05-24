@@ -1,5 +1,7 @@
 # Apps Similar to Curated Thoughts 
 
+![Comparative AI Memory Architectures](assets/app-comparison.jpg)
+
 ## GBrain
 
 I just saw this today in my news feed.
