@@ -8,6 +8,9 @@ Complete before the workshop:
 
 - [ ] Ollama installed and running — [ollama.com](https://ollama.com)
 - [ ] `nomic-embed-text` model pulled: `ollama pull nomic-embed-text`
+- [ ] LLM model pulled for Active Librarian (pick based on your RAM):
+  - 8 GB+ RAM: `ollama pull llama3.2`
+  - Under 8 GB RAM: `ollama pull qwen2.5:0.5b`
 - [ ] VSCode or Cursor installed
 - [ ] Curated Thoughts binary downloaded from [GitHub Releases](https://github.com/equationalapplications/curated-thoughts/releases) (install happens live in Act 2)
 - [ ] Node.js 18+ installed (for running `calculator.js` in Act 3)
@@ -108,13 +111,21 @@ Watch the indexing indicator in the app UI. The pipeline is running: chunk → e
 ollama list
 ```
 
-Expected: `nomic-embed-text` appears in the list. If missing:
+Expected output includes both models:
 
-```bash
-ollama pull nomic-embed-text
+```
+nomic-embed-text    ...   (embedding — used by the pipeline)
+llama3.2            ...   (LLM — used by the Active Librarian)
 ```
 
-In the app, open **Setup Status**. All indicators green = ready to continue.
+If either is missing, pull it now:
+
+```bash
+ollama pull nomic-embed-text   # if missing
+ollama pull llama3.2           # if missing (or qwen2.5:0.5b for <8 GB RAM)
+```
+
+The app auto-selects the LLM based on your system RAM — no manual configuration needed. The Setup Wizard confirms the selection during onboarding. In the app, open **Setup Status**. All indicators green = ready to continue.
 
 ### Wire the MCP (~10 min)
 
