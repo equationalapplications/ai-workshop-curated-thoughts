@@ -175,6 +175,8 @@ The Active Librarian has read your Stripe PDFs and proposed wiki pages, for exam
 
 Review one proposal. Approve it.
 
+> **If the Review Queue is empty:** the Active Librarian is still processing. Wait 2–3 minutes and refresh.
+
 Navigate to the **Wiki** tab. Open the approved page.
 
 **Key point:** The LLM didn't just store bytes. It read the PDFs and wrote a readable architectural guide. Your agent now retrieves both raw spec chunks (Facts) and this synthesized summary (Wisdom) in a single query — two layers of grounding.
@@ -208,6 +210,8 @@ Watch the agent:
 
 Accept the generated code and save.
 
+> **If the tool is not called:** re-check the `command` path in your MCP config from Act 2 and restart the editor, then retry the prompt.
+
 ### Code Review + Verify (~7 min)
 
 Open `payment.js` side-by-side with the Stripe API PDF.
@@ -219,7 +223,14 @@ Verify the generated payload:
 
 If the agent produced all three correctly, the demo is working: spec-grounded generation with no hallucinated parameters.
 
-**Optional — run the server** (requires Stripe test key in `.env`):
+**Optional — run the server** (requires Stripe test key in `.env`; `server.js` already wires `POST /api/create-checkout-session`):
+
+First, copy the env template:
+
+```bash
+cp .env.example .env
+# Edit .env and add your sk_test_... key
+```
 
 ```bash
 npm install
@@ -228,6 +239,7 @@ npm start
 
 ```bash
 # In a second terminal:
+# amount in cents (1000 = $10 USD)
 curl -X POST http://localhost:4242/api/create-checkout-session \
   -H "Content-Type: application/json" \
   -d '{"items": [{"name": "Workshop Item", "amount": 1000, "quantity": 1}]}'
