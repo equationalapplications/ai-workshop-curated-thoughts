@@ -8,16 +8,34 @@ https://www.marktechpost.com/2026/05/22/a-step-by-step-coding-tutorial-to-implem
 
 A Step-by-Step Coding Tutorial to Implement GBrain: The Self-Wiring Memory Layer Built by Y Combinator’s Garry Tan for AI Agents
 
-Uses knowelege grahph for people in the organization: "(works_at, founded, invested_in, attended, advises, mentions)"
+### Organization Focused Knowlege Graph
+
+- works_at
+- founded
+- invested_in
+- attended
+- advises
+- mentions
 
 
 ## CodeGraph
 
 I have been using CodeGraph with VSCode and Claude Code. I stole some code graph concepts and integrated them into my memory.
 
-Used code focused knowlege graph: "extract nodes (functions, classes, methods) and edges (calls, imports, extends, implements)"
-
 https://github.com/colbymchenry/codegraph
+
+### Code Focused Knowlege Graph
+
+**nodes**
+- functions
+- classes
+- methods 
+
+**edges**
+- calls
+- imports
+- extends
+- implements
 
 
 ## Open Brain from Nate B. Jones
