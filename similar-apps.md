@@ -1,4 +1,4 @@
-# App that is Similar to Curated Thought
+# Apps Similar to Curated Thoughts 
 
 ## GBrain
 
