@@ -82,29 +82,6 @@ Download from [GitHub Releases](https://github.com/equationalapplications/curate
 2. Run it — Windows Defender may warn; click **More Info → Run Anyway**
 3. The Setup Wizard opens after install
 
-### Set Up Your Vault (~12 min)
-
-A vault is a folder the app watches. Create one anywhere:
-
-```bash
-mkdir -p ~/curated-vault/documents
-```
-
-This creates the full directory tree in one command.
-
-In the app, point the vault at `~/curated-vault`. The app creates `.brain/` automatically.
-
-Drop `acme-loyalty-rules.md` into `documents/` (from the ZIP distributed before the workshop):
-
-```
-~/curated-vault/
-├── documents/
-│   └── acme-loyalty-rules.md
-└── .brain/                              ← created by app
-```
-
-Watch the indexing indicator in the app UI. The pipeline is running: chunk → embed. Starting now means indexing will be complete before the Act 3 demo.
-
 ### Verify Ollama (~5 min)
 
 ```bash
