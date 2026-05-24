@@ -2,78 +2,70 @@
 
 ## Curated Thoughts
 
-```ascii
-                     +---------------------------------+
-                     |   LOCAL DOCUMENTS VAULT         |
-                     |      (`documents/` dir)         |
-                     |   (Immutable Source Files:      |
-                     |    PDF, DOCX, Markdown, etc.)  |
-                     +-------+-------------------------+
-                             |
-                             v
-+----------------------------+-------------------------+
-|                TAURI / RUST BACKEND                   |
-|                                                      |
-|   1. FILE WATCHER: Detects additions/changes         |
-|   2. INGESTION PIPELINE:                              |
-|      +----------+      +-----------+     +---------+ |
-|      | CONVERT  |----->|   CHUNK   |---->|  EMBED  | |
-|      | (to MD)  |      |  DOCUMENTS |     | (BYOI)  | |
-|      +----------+      +-----------+     +---------+ |
-|                             |                  |     |
-|   3. ACTIVE LIBRARIAN:       v                  v     |
-|      +----------------------+-------------------+     |
-|      |        LOCAL SQLite DATABASE (.brain/)    |     |
-|      |           (Chunks, Vectors, Metadata)     |     |
-|      +----------------------+-------------------+     |
-|                             |                         |
-|                             v                         |
-|   4. SYNTHESIS: Uses Local BYOI LLM (e.g. Ollama)     |
-|      (via GenerateText + Core LLM Wiki logic)         |
-|      to create HUMAN-READABLE Wiki pages.             |
-|                             |                         |
-|                             v                         |
-|      +----------------------+-------------------+     |
-|      |       REVIEW & EDIT  (User Flow)         |     |
-|      +----------------------+-------------------+     |
-|                             |                         |
-|                             v                         |
-|   5. OUTPUT:                |                         |
-|      +----------------------+-------------------+     |
-|      |      LLM WIKI PAGES  (`wiki/` dir)       |     |
-|      |      (Reviewable, Persisted Memory)      |     |
-|      +------------------------------------------+     |
-|                                                      |
-+----------------------------+-------------------------+
-                             |
-                             v
-+----------------------------+-------------------------+
-|                  REACT FRONTEND UI                   |
-|                                                      |
-|   - BROWSE WIKI & RELATED NOTES                      |
-|   - EXPLORE CONTEXT FROM EMBEDDINGS                   |
-|   - SEARCH:                                           |
-|     +----------------------------------+             |
-|     | SEMANTIC SEARCH: Cosine Similarity|             |
-|     | KEYWORD FALLBACK: MiniSearch       |             |
-|     +----------------------------------+             |
-+------------------------------------------------------+
+Here is the revised, fully updated flowchart for Curated Thoughts. This new architecture reflects the completion of all four phases you highlighted, moving the app from a simple semantic search tool to a robust hybrid knowledge graph.
 
-                             +-------------------------+
-                             | EXPERIMENTAL: MCP SERVER|
-                             | (Hosts stdio server)    |
-                             | Allow external agents   |
-                             | (Cursor, Claude Desktop)|
-                             | to connect IN and query:||
-                             +-----------+-------------+
+The major additions here are the **Three-Tier inputs**, **Tree-sitter parsing**, **explicit edge extraction**, the **hybrid retrieval engine**, and the **unified MCP server**.
+
+```ascii
+                     +-------------------------------------------------------+
+                     |               THREE-TIER MEMORY INPUTS                |
+                     |                                                       |
+                     |  1. FACTS TIER:   `documents/` (Immutable docs, PDFs) |
+                     |  2. WISDOM TIER:  `wiki/` (Living AI-synthesized docs)|
+                     |  3. WORKING TIER: Local Code Repos (Ephemeral paths)  |
+                     +---------------------------+---------------------------+
+                                                 |
+                                                 v
++------------------------------------------------------------------------------------------+
+|                                 TAURI / RUST BACKEND                                     |
+|                                                                                          |
+|  1. FILE WATCHER & INCREMENTAL SYNC: Watches Vault and external Code directories         |
+|                                                                                          |
+|  2. DUAL INGESTION PIPELINE (Phase 1 & Phase 2):                                         |
+|     +--------------------+   +--------------------+   +-------------------------------+  |
+|     | AST PARSING        |   | CHUNKING &         |   | EDGE EXTRACTION (Tree-sitter) |  |
+|     | (Code chunks with  |-->| EMBEDDING          |-->| Maps explicit call-sites &    |  |
+|     |  symbol metadata)  |   | (Local BYOI Model) |   | cross-file structural links   |  |
+|     +--------------------+   +--------------------+   +-------------------------------+  |
+|               |                        |                              |                  |
+|               v                        v                              v                  |
+|  3. HYBRID SQLITE KNOWLEDGE BASE (`.brain/`):                                            |
+|     +---------------------------------------------------------------------------------+  |
+|     | - Document/Wiki Chunks & Vectors (`pgvector` cosine similarity)                 |  |
+|     | - `curated_relationships` table (Strict structural graph edges)                 |  |
+|     +---------------------------------------------------------------------------------+  |
+|                                        |                                                 |
+|  4. ACTIVE LIBRARIAN & GRAPH MAINTENANCE (Phase 4):                                      |
+|     - Synthesizes Wiki Pages (Flags Code vs. Doc "Architectural Inconsistencies")        |
+|     - Background CRON auto-heals broken links and prunes dead relationships / cache      |
++----------------------------------------+-------------------------------------------------+
                                          |
                                          v
-+----------------------------------------+-------------+
-|               EXTERNAL AI AGENTS                     |
-|         - Query SQLite Brain Chunks                 |
-|         - Access Metadata                           |
-|         - Utilize Local Knowledge Base              |
-+------------------------------------------------------+
++------------------------------------------------------------------------------------------+
+|                       HYBRID RETRIEVAL ENGINE (Phase 3)                                  |
+|                                                                                          |
+|  Fused query execution via Rust:                                                         |
+|  1. SEMANTIC SEARCH: Finds conceptually related nodes via vectors.                       |
+|  2. HOP-BASED TRAVERSAL: Follows structural edges to exact code/doc prerequisites.       |
+|  3. KEYWORD FALLBACK: MiniSearch / FTS for offline exact matching.                       |
++----------------------+-------------------------------------------------+-----------------+
+                       |                                                 |
+                       v                                                 v
++----------------------+--------------------+          +-----------------+-----------------+
+|              REACT FRONTEND UI            |          |     UNIFIED MCP STDIO SERVER      |
+|                                           |          |                                   |
+|  - Browse Wisdom (Wiki) & Facts           |          | - Single gateway for all data     |
+|  - Human-in-the-loop review queue         |          | - Serves structural tools (trace_ |
+|  - Explore visual hybrid relationship web |          |   call_path) & semantic searches  |
++-------------------------------------------+          +-----------------+-----------------+
+                                                                         |
+                                                                         v
+                                                       +-----------------+-----------------+
+                                                       |       EXTERNAL AI AGENTS          |
+                                                       |   (Cursor, Claude Desktop, Zed)   |
+                                                       |  Queries the unified graph rather |
+                                                       |  than blindly reading raw files.  |
+                                                       +-----------------------------------+
 
 ```
 
