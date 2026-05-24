@@ -154,3 +154,106 @@ You should see the tool invoked in the agent's reasoning trace. If not, verify t
 Before Act 3: confirm everyone has `curated-thoughts` visible in their agent chat. Fix stragglers now — the demo requires a working MCP connection.
 
 ---
+
+## Act 3: Stripe Demo (~40 min)
+
+**Milestone:** Prompt an agent that retrieves from local memory and writes correct, spec-grounded Stripe code.
+
+### Confirm Indexing Complete (~5 min)
+
+The Stripe PDFs you dropped in Act 2 should be fully indexed by now. Check the app UI — both files should show green status in the vault view.
+
+Both are now in your **Facts Tier**: immutable, authoritative source of truth for the Stripe API.
+
+### Curate the Wisdom Tier (~10 min)
+
+Open the **Review Queue** tab.
+
+The Active Librarian has read your Stripe PDFs and proposed wiki pages, for example:
+- "Stripe Checkout Integration Rules"
+- "Required Payload Structures for Checkout Sessions"
+
+Review one proposal. Approve it.
+
+Navigate to the **Wiki** tab. Open the approved page.
+
+**Key point:** The LLM didn't just store bytes. It read the PDFs and wrote a readable architectural guide. Your agent now retrieves both raw spec chunks (Facts) and this synthesized summary (Wisdom) in a single query — two layers of grounding.
+
+### Open the Boilerplate Repo (~3 min)
+
+Clone or unzip the starter repo (from the facilitator):
+
+```
+curated-thoughts-stripe-demo/
+├── controllers/
+│   └── payment.js       ← empty stub — fill this with the agent
+├── server.js
+├── package.json
+└── .env.example
+```
+
+Open `controllers/payment.js`. The implementation is a bare try/catch shell with a TODO comment.
+
+### Prompt the Agent (~10 min)
+
+Open VSCode/Cursor agent chat. Run this prompt verbatim:
+
+> *"Use the curated-thoughts tool to look up the Stripe API specs in our memory. Write the implementation for the `createCheckoutSession` controller using the exact required payload structure from the documentation."*
+
+Watch the agent:
+1. Invoke the `curated-thoughts` MCP tool
+2. Query your local SQLite database
+3. Read back chunks from the Stripe PDFs
+4. Write code grounded in your actual docs — not training memory
+
+Accept the generated code and save.
+
+### Code Review + Verify (~7 min)
+
+Open `payment.js` side-by-side with the Stripe API PDF.
+
+Verify the generated payload:
+- `line_items` array with nested `price_data` object — required
+- `mode: 'payment'` — required
+- `success_url` and `cancel_url` — required
+
+If the agent produced all three correctly, the demo is working: spec-grounded generation with no hallucinated parameters.
+
+**Optional — run the server** (requires Stripe test key in `.env`):
+
+```bash
+npm install
+npm start
+```
+
+```bash
+# In a second terminal:
+curl -X POST http://localhost:4242/api/create-checkout-session \
+  -H "Content-Type: application/json" \
+  -d '{"items": [{"name": "Workshop Item", "amount": 1000, "quantity": 1}]}'
+```
+
+### What's Next (~5 min)
+
+Add your own knowledge to the Facts Tier:
+- Your API specs, architecture decision records, runbooks → `documents/`
+- Your actual codebase → Working Tier (configure in app Settings under **Watched Repositories**)
+- Use the MCP from any agent: Claude Code, Cursor, VSCode Copilot, Cline
+
+**Resources:**
+- [Curated Thoughts on GitHub](https://github.com/equationalapplications/curated-thoughts)
+- [`@equationalapplications/react-llm-wiki`](https://www.npmjs.com/package/@equationalapplications/react-llm-wiki)
+- [`@equationalapplications/core-llm-wiki`](https://www.npmjs.com/package/@equationalapplications/core-llm-wiki)
+
+---
+
+## Timing Reference
+
+| Act | Content | Time |
+|-----|---------|------|
+| Pre-workshop | Prerequisites, download binary | Before |
+| Act 1 | Architecture | ~20 min |
+| Act 2 | Install + Configure | ~40 min |
+| Act 3 | Stripe Demo | ~40 min |
+| Buffer | Q&A / OS issues | 10–20 min |
+| **Total** | | **90–120 min** |
