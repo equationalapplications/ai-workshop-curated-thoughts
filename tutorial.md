@@ -28,7 +28,7 @@ The root cause: the agent is reasoning from memory, not from your actual specs. 
 
 Curated Thoughts organizes knowledge into three tiers that compose at query time:
 
-| Tier | Name | What lives here | Mutability |
+| Tier | Name | What Lives Here | Mutability |
 |------|------|-----------------|------------|
 | 1 | **Facts** | PDFs, API specs, immutable source docs | Immutable — app never writes here |
 | 2 | **Wisdom** | AI-synthesized wiki pages, architectural summaries | Living — approved by you |
