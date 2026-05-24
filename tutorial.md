@@ -10,7 +10,7 @@ Complete before the workshop:
 - [ ] `nomic-embed-text` model pulled: `ollama pull nomic-embed-text`
 - [ ] VSCode or Cursor installed
 - [ ] Curated Thoughts binary downloaded from [GitHub Releases](https://github.com/equationalapplications/curated-thoughts/releases) (install happens live in Act 2)
-- [ ] Node.js 18+ installed (for the Stripe demo boilerplate)
+- [ ] Node.js 18+ installed (for running `calculator.js` in Act 3)
 
 ---
 
@@ -18,9 +18,9 @@ Complete before the workshop:
 
 ### The Problem (~3 min)
 
-Prompt your coding agent: *"Write me a Stripe checkout controller."*
+Prompt your coding agent: *"Implement the Acme loyalty calculator."*
 
-It writes something. The payload looks plausible. But it hallucinates parameter names, inverts required and optional fields, uses deprecated API shapes from its training data. You spend 30 minutes debugging against the real Stripe docs.
+It writes something. The logic looks plausible. But it hallucinates the tier multipliers, gets the Electronics cap wrong, misses the Tuesday bonus. The rules are proprietary — they're not on the internet — so the agent reasons from training memory and gets them wrong.
 
 The root cause: the agent is reasoning from memory, not from your actual specs. Curated Thoughts gives agents a local, authoritative memory grounded in documents you control.
 
@@ -84,25 +84,23 @@ Download from [GitHub Releases](https://github.com/equationalapplications/curate
 A vault is a folder the app watches. Create one anywhere:
 
 ```bash
-mkdir -p ~/curated-vault/documents/stripe
+mkdir -p ~/curated-vault/documents
 ```
 
 This creates the full directory tree in one command.
 
 In the app, point the vault at `~/curated-vault`. The app creates `.brain/` automatically.
 
-Drop the workshop Stripe PDFs into `documents/stripe/` (from the ZIP distributed before the workshop):
+Drop `acme-loyalty-rules.md` into `documents/` (from the ZIP distributed before the workshop):
 
 ```
 ~/curated-vault/
 ├── documents/
-│   └── stripe/
-│       ├── stripe-node-quickstart.pdf
-│       └── stripe-checkout-session-api.pdf
+│   └── acme-loyalty-rules.md
 └── .brain/                              ← created by app
 ```
 
-Watch the indexing indicator in the app UI. The pipeline is running: convert → chunk → embed. Starting now means indexing will be complete before the Act 3 demo.
+Watch the indexing indicator in the app UI. The pipeline is running: chunk → embed. Starting now means indexing will be complete before the Act 3 demo.
 
 ### Verify Ollama (~5 min)
 
@@ -155,23 +153,23 @@ Before Act 3: confirm everyone has `curated-thoughts` visible in their agent cha
 
 ---
 
-## Act 3: Stripe Demo (~40 min)
+## Act 3: Acme Loyalty Demo (~40 min)
 
-**Milestone:** Prompt an agent that retrieves from local memory and writes correct, spec-grounded Stripe code.
+**Milestone:** Prompt an agent that retrieves from local memory and writes correct, spec-grounded code — verified instantly with `node calculator.js`.
 
 ### Confirm Indexing Complete (~5 min)
 
-The Stripe PDFs you dropped in Act 2 should be fully indexed by now. Check the app UI — both files should show green status in the vault view.
+The `acme-loyalty-rules.md` file you dropped in Act 2 should be fully indexed by now. Check the app UI — it should show green status in the vault view.
 
-Both are now in your **Facts Tier**: immutable, authoritative source of truth for the Stripe API.
+It is now in your **Facts Tier**: immutable, authoritative source of truth for the Acme loyalty rules.
 
 ### Curate the Wisdom Tier (~10 min)
 
 Open the **Review Queue** tab.
 
-The Active Librarian has read your Stripe PDFs and proposed wiki pages, for example:
-- "Stripe Checkout Integration Rules"
-- "Required Payload Structures for Checkout Sessions"
+The Active Librarian has read your spec and proposed wiki pages, for example:
+- "Acme Loyalty Tiers"
+- "Acme Points Calculation Rules"
 
 Review one proposal. Approve it.
 
@@ -179,71 +177,54 @@ Review one proposal. Approve it.
 
 Navigate to the **Wiki** tab. Open the approved page.
 
-**Key point:** The LLM didn't just store bytes. It read the PDFs and wrote a readable architectural guide. Your agent now retrieves both raw spec chunks (Facts) and this synthesized summary (Wisdom) in a single query — two layers of grounding.
+**Key point:** The LLM didn't just store bytes. It read the spec and wrote a readable architectural guide. Your agent now retrieves both raw spec chunks (Facts) and this synthesized summary (Wisdom) in a single query — two layers of grounding.
 
-### Open the Boilerplate Repo (~3 min)
+### Open the Boilerplate (~3 min)
 
-Clone or unzip the starter repo (from the facilitator):
+Clone or unzip the starter files (from the facilitator):
 
 ```
-curated-thoughts-stripe-demo/
-├── controllers/
-│   └── payment.js       ← empty stub — fill this with the agent
-├── server.js
-├── package.json
-└── .env.example
+curated-thoughts-acme-demo/
+├── calculator.js           ← empty stub — fill this with the agent
+└── documents/
+    └── acme-loyalty-rules.md
 ```
 
-Open `controllers/payment.js`. The implementation is a bare try/catch shell with a TODO comment.
+Open `calculator.js`. The implementation is a bare stub returning `0`, with test assertions already wired at the bottom.
 
 ### Prompt the Agent (~10 min)
 
 Open VSCode/Cursor agent chat. Run this prompt verbatim:
 
-> *"Use the curated-thoughts tool to look up the Stripe API specs in our memory. Write the implementation for the `createCheckoutSession` controller using the exact required payload structure from the documentation."*
+> *"Use the curated-thoughts tool to look up the Acme Loyalty Points Specification in our memory. Write the implementation for `calculatePoints` using the exact multipliers, tier rules, and category caps from the document."*
 
 Watch the agent:
 1. Invoke the `curated-thoughts` MCP tool
 2. Query your local SQLite database
-3. Read back chunks from the Stripe PDFs
+3. Read back chunks from `acme-loyalty-rules.md`
 4. Write code grounded in your actual docs — not training memory
 
 Accept the generated code and save.
 
 > **If the tool is not called:** re-check the `command` path in your MCP config from Act 2 and restart the editor, then retry the prompt.
 
-### Code Review + Verify (~7 min)
-
-Open `payment.js` side-by-side with the Stripe API PDF.
-
-Verify the generated payload:
-- `line_items` array with nested `price_data` object — required
-- `mode: 'payment'` — required
-- `success_url` and `cancel_url` — required
-
-If the agent produced all three correctly, the demo is working: spec-grounded generation with no hallucinated parameters.
-
-**Optional — run the server** (requires Stripe test key in `.env`; `server.js` already wires `POST /api/create-checkout-session`):
-
-First, copy the env template:
+### Verify (~7 min)
 
 ```bash
-cp .env.example .env
-# Edit .env and add your sk_test_... key
+node calculator.js
 ```
 
-```bash
-npm install
-npm start
+Expected output:
+
+```
+Test 1 (Silver, $100, Monday): 1500
+Test 2 (Gold, $100, Tuesday): 2550
+Test 3 (Bronze, $300, Electronics): 500
 ```
 
-```bash
-# In a second terminal:
-# amount in cents (1000 = $10 USD)
-curl -X POST http://localhost:4242/api/create-checkout-session \
-  -H "Content-Type: application/json" \
-  -d '{"items": [{"name": "Workshop Item", "amount": 1000, "quantity": 1}]}'
-```
+If all three match, the demo is working. The rules don't exist on the internet — the only way the agent produced the correct multipliers and caps is by retrieving them from your local memory.
+
+**If a value is wrong:** the agent hallucinated that rule. Re-prompt with: *"The Electronics cap is wrong — re-read the spec via curated-thoughts and fix `calculatePoints`."* Watch it retrieve and correct.
 
 ### What's Next (~5 min)
 
