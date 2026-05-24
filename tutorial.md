@@ -65,7 +65,7 @@ Download from [GitHub Releases](https://github.com/equationalapplications/curate
 **macOS**
 1. Download the `.dmg` file
 2. Open it, drag Curated Thoughts to Applications
-3. First launch: macOS will block it — open **System Preferences → Security & Privacy → General**, click **Open Anyway**
+3. First launch: macOS will block it — open **System Settings → Privacy & Security** (macOS Ventura+) or **System Preferences → Security & Privacy → General** (older macOS), click **Open Anyway**
 4. The Setup Wizard opens — work through it
 
 **Linux**
@@ -84,9 +84,10 @@ Download from [GitHub Releases](https://github.com/equationalapplications/curate
 A vault is a folder the app watches. Create one anywhere:
 
 ```bash
-mkdir ~/curated-vault
 mkdir -p ~/curated-vault/documents/stripe
 ```
+
+This creates the full directory tree in one command.
 
 In the app, point the vault at `~/curated-vault`. The app creates `.brain/` automatically.
 
@@ -136,22 +137,9 @@ You'll get a JSON snippet:
 }
 ```
 
-**VSCode Copilot** — paste into `.vscode/mcp.json` at your workspace root:
+**VSCode Copilot** — paste the JSON snippet into `.vscode/mcp.json` at your workspace root. The format is identical to what the app copied.
 
-```json
-{
-  "mcpServers": {
-    "curated-thoughts": {
-      "command": "/path/to/curated-thoughts-mcp",
-      "env": {
-        "CURATED_BRAIN_DIR": "/path/to/.brain"
-      }
-    }
-  }
-}
-```
-
-**Cursor** — paste into `.cursor/mcp.json` at your repo root or home directory.
+**Cursor** — paste the same JSON into `.cursor/mcp.json`. Use your repo root for a project-specific setup, or `~/.cursor/mcp.json` for a global setup available across all repos.
 
 Restart the editor. Open agent chat. Run:
 
